@@ -284,3 +284,56 @@ Issues, pull requests, and real-world diagrams are welcome. Start with the [cont
 ## Star History
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/tt-a1i/archify/star-history/assets/star-history-dark.svg" /><img alt="Star History" src="https://raw.githubusercontent.com/tt-a1i/archify/star-history/assets/star-history-light.svg" /></picture></p>
+# Archify — traduction française dérivée
+
+> **Ce dépôt personnel privé est une traduction française dérivée du projet original [tt-a1i/archify](https://github.com/tt-a1i/archify).** Il ne s’agit ni d’une version officielle, ni d’une nouvelle implémentation, ni d’un remplacement de l’original.
+
+## Provenance
+
+- Projet original : https://github.com/tt-a1i/archify
+- Dépôt personnel privé : https://github.com/LucMacPaquet/archify
+- Branche de traduction : `lucpaquet/archify-francais`
+- Licence et code source : hérités du projet original; voir `LICENSE` et `THIRD_PARTY_NOTICES.md`.
+
+Cette branche conserve l’architecture, les schémas, le moteur, les tests et les contrats de l’original. Les changements ajoutés ici servent à traduire l’interface, la documentation, les exemples et les tests de localisation en français. Toute différence fonctionnelle doit être explicitement documentée comme telle.
+
+## Archify
+
+Archify transforme une description de système ou un dépôt de code en diagramme interactif et vérifiable. Les modes disponibles sont : architecture, workflow, séquence, flux de données et cycle de vie.
+
+Le résultat est un fichier HTML autonome avec SVG intégré, thèmes clair/sombre, navigation, export et validation déterministe.
+
+## Statut de la traduction
+
+La traduction française est en cours. L’interface fixe doit encore être complétée pour les vues guidées, l’exploration sémantique, la légende, les exports, les erreurs et l’accessibilité. Les noms de produits, API, protocoles, identifiants et commandes restent inchangés.
+
+Voir :
+
+- [[README.fr.md|Guide français détaillé]]
+- [[TRANSLATION.fr.md|Politique de traduction et de synchronisation]]
+
+## Installation
+
+```bash
+npx skills add tt-a1i/archify --skill archify --agent opencode --global --copy --yes
+node archify/bin/archify.mjs doctor
+```
+
+## Validation
+
+```bash
+node archify/bin/archify.mjs validate architecture exemple.json --quality showcase --json
+node archify/bin/archify.mjs deliver architecture exemple.json diagramme.html --quality showcase --json
+node archify/bin/archify.mjs visual-check diagramme.html --json
+```
+
+## Synchronisation
+
+Le dépôt original est le remote `origin`; le dépôt personnel privé est le remote `personal`.
+
+```bash
+git fetch origin
+git push personal lucpaquet/archify-francais
+```
+
+Ne pas présenter cette branche comme une publication officielle d’Archify. Conserver la licence MIT, les mentions de copyright et les avis de tiers du projet original.
