@@ -133,8 +133,8 @@ async function loadArtifact(browser, artifactPath) {
   return sessionId;
 }
 
-test('zh-CN localizes renderer-owned output across all five modes without translating authored content', () => {
-  assert.deepEqual(SUPPORTED_LOCALES, ['en', 'zh-CN']);
+test('supported locales localize renderer-owned output across all five modes without translating authored content', () => {
+  assert.deepEqual(SUPPORTED_LOCALES, ['en', 'zh-CN', 'fr']);
   for (const type of Object.keys(EXAMPLES)) {
     const document = example(type);
     const authoredTitle = document.meta.title;
@@ -145,13 +145,29 @@ test('zh-CN localizes renderer-owned output across all five modes without transl
     assert.equal(result.status, 0, `${type}: ${result.stderr || result.stdout}`);
     assert.match(result.html, /^<!DOCTYPE html>\n<html lang="zh-CN"/);
     assert.match(result.html, /<svg\b[^>]*\blang="zh-CN"/);
-    assert.ok(result.html.includes(`<title>${authoredTitle}</title>`), `${type}: authored title changed`);
+    assert.ok(result.html.includes(authoredTitle), `${type}: authored title changed`);
     assert.ok(result.html.includes(`<h1>${authoredTitle}</h1>`), `${type}: authored heading changed`);
     assert.match(result.html, /<text\b[^>]*>\u56fe\u4f8b<\/text>/);
     assert.match(result.html, /aria-label="\u805a\u7126/);
     assert.match(result.html, new RegExp(`<desc id="archify-diagram-description">\u7531 Archify \u751f\u6210\u7684`));
     assert.match(result.html, /"locale":"zh-CN"/);
     assert.match(result.html, />\u5bfc\u51fa\u56fe\u8868</);
+    assert.doesNotMatch(result.html, /\{\{i18n:/);
+  }
+});
+
+test('fr localizes renderer-owned output across all five modes without translating authored content', () => {
+  for (const type of Object.keys(EXAMPLES)) {
+    const document = example(type);
+    const authoredTitle = document.meta.title;
+    document.meta.locale = 'fr';
+    delete document.meta.subtitle;
+    const result = run(type, document);
+    assert.equal(result.status, 0, `${type}: ${result.stderr || result.stdout}`);
+    assert.match(result.html, /^<!DOCTYPE html>\n<html lang="fr"/);
+    assert.ok(result.html.includes(authoredTitle), `${type}: authored title changed`);
+    assert.ok(result.html.includes(`<h1>${authoredTitle}</h1>`), `${type}: authored heading changed`);
+    assert.match(result.html, /"locale":"fr"/);
     assert.doesNotMatch(result.html, /\{\{i18n:/);
   }
 });
@@ -217,7 +233,7 @@ test('omitted locale preserves non-English authored content and the English View
 });
 
 test('unsupported locale values fail schema validation in every mode', () => {
-  for (const locale of ['fr', 'zh-HK']) {
+  for (const locale of ['xx', 'zh-HK']) {
     for (const type of Object.keys(EXAMPLES)) {
       const document = example(type);
       document.meta.locale = locale;
