@@ -80,11 +80,14 @@ function versionLabels(source) {
 
 function checkReadme(relativePath, source, version, language, isDevelopment) {
   const badge = `/badge/version-${shieldEscape(version)}-`;
-  const markerLabel = language === 'zh'
-    ? isDevelopment ? '当前开发版本：' : '当前稳定版本：'
-    : isDevelopment ? 'Current development version:' : 'Current stable version:';
+  const markerLabels = language === 'zh'
+    ? [isDevelopment ? '当前开发版本：' : '当前稳定版本：']
+    : language === 'fr'
+      ? [isDevelopment ? 'Version de développement actuelle :' : 'Version stable actuelle :',
+        isDevelopment ? 'Current development version:' : 'Current stable version:']
+      : [isDevelopment ? 'Current development version:' : 'Current stable version:'];
   const identity = isDevelopment ? 'development' : 'stable';
-  const hasMarker = source.split('\n').some((line) => line.includes(markerLabel) && line.includes(`\`v${version}\``));
+  const hasMarker = source.split('\n').some((line) => markerLabels.some((label) => line.includes(label)) && line.includes(`\`v${version}\``));
   if (!source.includes(badge) || !hasMarker) {
     fail(`${relativePath} must advertise ${identity} identity v${version} with an exact escaped badge and explicit ${identity} marker.`);
   }
@@ -106,16 +109,26 @@ function checkRavenBoundary(relativePath, source, language) {
   const installedRoot = `${installParent}\/archify`;
   const pathBoundary = String.raw`(?=$|[\s\x60'"<>,.;:，；。])`;
   const hasEnglishManual = /manual ZIP/i.test(source);
+  const hasFrenchManual = /ZIP manuelle/i.test(source);
   const hasChineseManual = /(?:手动[^\n<]{0,40}ZIP|ZIP[^\n<]{0,40}手动)/i.test(source);
   const hasRequiredCopy = language === 'both'
     ? hasEnglishManual && hasChineseManual
-    : language === 'zh' ? hasChineseManual : hasEnglishManual;
+      : language === 'zh' ? hasChineseManual
+        : language === 'fr' ? hasFrenchManual || hasEnglishManual : hasEnglishManual;
   const englishExtractsIntoParent = new RegExp(
     String.raw`(?:extract|unpack)[^\n]{0,180}archify\.zip[^\n]{0,180}(?:into|to)\s*[\x60'"<]*${installParent}${pathBoundary}`,
     'i',
   ).test(source);
   const englishExplainsInstalledRoot = new RegExp(
     String.raw`(?:yields?|creates?|produces?|results? in)[^\n]{0,120}${installedRoot}`,
+    'i',
+  ).test(source);
+  const frenchExtractsIntoParent = new RegExp(
+    String.raw`ZIP[^\n]{0,180}(?:dans|vers)\s*[\x60'"<]*${installParent}${pathBoundary}`,
+    'i',
+  ).test(source);
+  const frenchExplainsInstalledRoot = new RegExp(
+    String.raw`(?:produit|donne|contient|permet)[^\n]{0,120}${installedRoot}`,
     'i',
   ).test(source);
   const chineseExtractsIntoParent = new RegExp(
@@ -131,7 +144,10 @@ function checkRavenBoundary(relativePath, source, language) {
       && chineseExtractsIntoParent && chineseExplainsInstalledRoot
     : language === 'zh'
       ? chineseExtractsIntoParent && chineseExplainsInstalledRoot
-      : englishExtractsIntoParent && englishExplainsInstalledRoot;
+      : language === 'fr'
+        ? (frenchExtractsIntoParent && frenchExplainsInstalledRoot)
+          || (englishExtractsIntoParent && englishExplainsInstalledRoot)
+        : englishExtractsIntoParent && englishExplainsInstalledRoot;
   const nestedDestination = new RegExp(
     String.raw`(?:\b(?:extract|unpack)[^\n]{0,220}(?:into|to)|解压(?:到|至))\s*[\x60'"<]*${installedRoot}`,
     'i',
@@ -249,11 +265,11 @@ if (hasSupportedVersion) {
   const english = read('README.md');
   const englishMirror = read('README_EN.md');
   const chinese = read('README_ZH.md');
-  checkReadme('README.md', english, version, 'en', isDevelopment);
-  checkReadme('README_EN.md', englishMirror, version, 'en', isDevelopment);
+  checkReadme('README.md', english, version, 'fr', isDevelopment);
+  checkReadme('README_EN.md', englishMirror, version, 'fr', isDevelopment);
   checkReadme('README_ZH.md', chinese, version, 'zh', isDevelopment);
-  checkRavenBoundary('README.md', english, 'en');
-  checkRavenBoundary('README_EN.md', englishMirror, 'en');
+  checkRavenBoundary('README.md', english, 'fr');
+  checkRavenBoundary('README_EN.md', englishMirror, 'fr');
   checkRavenBoundary('README_ZH.md', chinese, 'zh');
   if (english !== englishMirror) fail('README_EN.md must remain byte-identical to README.md.');
 

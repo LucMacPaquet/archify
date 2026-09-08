@@ -122,7 +122,7 @@ test('all README languages keep the product hero and retain the verified animate
     const heroIndex = readme.indexOf('docs/assets/archify-readme-hero.png');
     const titleIndex = readme.indexOf('# Archify');
     const proofIndex = readme.indexOf('docs/assets/archify-live-proof.gif');
-    const demosIndex = Math.max(readme.indexOf('## See Archify in action'), readme.indexOf('## 看看 Archify 能做什么'));
+    const demosIndex = Math.max(readme.indexOf('## See Archify in action'), readme.indexOf('## 看看 Archify 能做什么'), readme.indexOf('## Archify en action'));
     assert.ok(heroIndex >= 0 && heroIndex < titleIndex, `${filename}: product hero is not above the title`);
     assert.ok(proofIndex > demosIndex, `${filename}: animated proof must live in the demo section`);
     assert.match(readme, /docs\/assets\/archify-live-proof\.gif/);
@@ -184,9 +184,9 @@ test('README demos use checked-in captures and live deep links below the existin
     const readme = fs.readFileSync(path.join(repoRoot, filename), 'utf8');
     const heroIndex = readme.indexOf('docs/assets/archify-readme-hero.png');
     const proofIndex = readme.indexOf('docs/assets/archify-live-proof.gif');
-    const previewIndex = Math.max(readme.indexOf('## Preview'), readme.indexOf('## 预览'));
-    const demosIndex = Math.max(readme.indexOf('## See Archify in action'), readme.indexOf('## 看看 Archify 能做什么'));
-    const quickStartIndex = Math.max(readme.indexOf('## Quick start'), readme.indexOf('## 快速开始'));
+    const previewIndex = Math.max(readme.indexOf('## Preview'), readme.indexOf('## 预览'), readme.indexOf('## Aperçu'));
+    const demosIndex = Math.max(readme.indexOf('## See Archify in action'), readme.indexOf('## 看看 Archify 能做什么'), readme.indexOf('## Archify en action'));
+    const quickStartIndex = Math.max(readme.indexOf('## Quick start'), readme.indexOf('## 快速开始'), readme.indexOf('## Démarrage rapide'));
     assert.ok(heroIndex >= 0 && heroIndex < demosIndex, `${filename}: existing hero proof moved`);
     assert.ok(demosIndex < previewIndex && previewIndex < quickStartIndex, `${filename}: demo section is misplaced`);
     assert.ok(demosIndex < proofIndex && proofIndex < previewIndex, `${filename}: animated proof is outside the demo section`);
@@ -217,7 +217,7 @@ test('README stays scannable without deleting the visual proof set', () => {
   for (const filename of ['README.md', 'README_EN.md', 'README_ZH.md']) {
     const readme = fs.readFileSync(path.join(repoRoot, filename), 'utf8');
     assert.ok(readme.split('\n').length <= 295, `${filename}: README grew beyond the scannable line budget`);
-    assert.match(readme, filename === 'README_ZH.md' ? /不需要绑定代码库/ : /No repository is required/);
+    assert.match(readme, filename === 'README_ZH.md' ? /不需要绑定代码库/ : /(?:No repository is required|Aucun dépôt n’est requis)/);
     for (const asset of commonAssets) {
       assert.ok(readme.includes(`docs/assets/${asset}`), `${filename}: visual proof ${asset} was removed`);
     }
@@ -225,7 +225,8 @@ test('README stays scannable without deleting the visual proof set', () => {
 
   const english = fs.readFileSync(path.join(repoRoot, 'README.md'), 'utf8');
   const wordCount = english.trim().split(/\s+/).length;
-  const intro = english.slice(0, english.indexOf('![License]'));
+  const introEnd = Math.max(english.indexOf('![License]'), english.indexOf('![Licence]'));
+  const intro = english.slice(0, introEnd);
   const introBullets = intro.match(/^- \*\*/gm) || [];
   assert.ok(wordCount <= 2085, `README.md is too verbose again (${wordCount} words)`);
   assert.ok(introBullets.length <= 8, `README.md has too many top-level capability bullets (${introBullets.length})`);
@@ -241,8 +242,8 @@ test('all README languages end with the self-hosted star history chart', () => {
 
   for (const filename of ['README.md', 'README_EN.md', 'README_ZH.md']) {
     const readme = fs.readFileSync(path.join(repoRoot, filename), 'utf8');
-    const sectionIndex = readme.lastIndexOf('## Star History');
-    const contributingIndex = Math.max(readme.indexOf('## Contributing'), readme.indexOf('## 参与贡献'));
+    const sectionIndex = Math.max(readme.lastIndexOf('## Star History'), readme.lastIndexOf('## Historique des étoiles'));
+    const contributingIndex = Math.max(readme.indexOf('## Contributing'), readme.indexOf('## 参与贡献'), readme.indexOf('## Contribution'));
     assert.ok(sectionIndex > contributingIndex, `${filename}: Star History must follow Contributing`);
     assert.ok(readme.includes(lightChart), `${filename}: missing light star history chart`);
     assert.ok(readme.includes(darkChart), `${filename}: missing dark star history chart`);

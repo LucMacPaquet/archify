@@ -19,7 +19,7 @@ test('Cursor onboarding stays explicit, bilingual, and backed by the same Skill'
   const landing = fs.readFileSync(path.join(repoRoot, 'docs', 'index.html'), 'utf8');
 
   assert.equal(english, englishMirror, 'English README mirrors must stay synchronized');
-  assert.match(english, /Cursor, Claude Code, Codex CLI, and OpenCode/);
+  assert.match(english, /Cursor, Claude Code, Codex CLI et OpenCode/);
   assert.match(chinese, /Cursor、Claude Code、Codex CLI 和 OpenCode/);
   for (const surface of [english, chinese, landing]) assert.ok(surface.includes(cursorCommand));
   for (const surface of [english, chinese, start, landing]) {
